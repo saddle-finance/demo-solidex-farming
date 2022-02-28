@@ -14,8 +14,8 @@ const USD_THRESHOLD = 500
 const GAS_PRICE = utils.parseUnits("4000", "gwei") // gas is cheap on ftm so use a high value
 
 const POOLS = {
-    SOLID_SOLIDSEX: "0x62E2819Dd417F3b430B6fa5Fd34a49A377A02ac8",
-    USDC_SYN: "0xB1b3B96cf35435b2518093acD50E02fe03A0131f"
+    SOLID_SOLIDSEX: "0x62E2819Dd417F3b430B6fa5Fd34a49A377A02ac8", // sAMM
+    USDC_SYN: "0xB1b3B96cf35435b2518093acD50E02fe03A0131f" // vAMM
 }
 const TOKENS = {
     USDC: {
@@ -118,7 +118,7 @@ async function getSOLIDtoSOLIDSEXRate(amount) {
     const result = await routerContract.getAmountsOut(
         amount,
         [
-            [TOKENS.SOLID.address, TOKENS.SOLIDSEX.address,false],
+            [TOKENS.SOLID.address, TOKENS.SOLIDSEX.address, true], // this may not be the best route based on pool composition
         ]
     )
     return result[1]
@@ -183,7 +183,7 @@ async function main() {
                 solidBalance.div(2),
                 minAmountOut.mul(99).div(200), // min Amt out
                 [
-                    [TOKENS.SOLID.address,TOKENS.SOLIDSEX.address,true],
+                    [TOKENS.SOLID.address,TOKENS.SOLIDSEX.address,true], // `true` here means stable (sAMM), false is volatile (vAMM)
                 ], // route
                 signer.address, // recipient
                 nowPlusMins(10), // deadline
